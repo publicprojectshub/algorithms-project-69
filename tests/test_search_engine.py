@@ -16,11 +16,14 @@ input_str = "Hello, World! ;:>=-)_This is a test: @2023 #Python."
 
 
 def test_search():
-    assert search_engine.search(docs, 'shoot') == ['doc1', 'doc2']
     assert search_engine.search(docs, 'money') == []
     assert search_engine.search([], 'shoot') == []
     assert search_engine.search(docs, 'pint') == ['doc1']
     assert search_engine.search(docs, 'shooter') == ['doc3', 'doc4']
+
+
+def test_search_relevance():
+    assert search_engine.search(docs, 'shoot') == ['doc2', 'doc1']
 
 
 def test_string_cleaner():
