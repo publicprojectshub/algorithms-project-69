@@ -1,18 +1,35 @@
 import re
+from collections import Counter
 
 
-def string_cleaner(input_string):
-    pattern = r'[!\"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~]'
-    cleaned_string = re.sub(pattern, '', input_string, flags=re.IGNORECASE)
-    return cleaned_string
+def tokenize(text):
+    # return list of split and lower text and digits
+    return re.findall(r'[a-zA-Z0-9]+', text.lower())
 
 
-def search(docs: list, target_string: str):
-    searched_docs = dict()  # {doc_id_with_target_string: target_string_amount}
+def calculate_relevance_score(doc_tokens, query_tokens):
+    doc_counter = Counter(doc_tokens)
+    query_counter = Counter(query_tokens)
+
+    intersections = set(doc_counter) & set(query_counter)
+    intersections_score = sum(doc_counter[word] * query_counter[word] for word in intersections)
+
+    return intersections_score
+
+
+def search(docs: list, query: str):
+    query_tokens = tokenize(query)
+
+    # (doc id: score)
+    found_docs = []
+
     for doc in docs:
-        doc_cleaned_text = string_cleaner(doc['text']).lower().split()
-        if target_string.lower() in doc_cleaned_text:
-            searched_docs[doc['id']] = doc['text'].count(target_string)
-    # sorted dict to list
-    result = [doc[0] for doc in sorted(searched_docs.items(), key=lambda item: item[1], reverse=True)]
+        doc_tokens = tokenize(doc['text'])
+        score = calculate_relevance_score(doc_tokens, query_tokens)
+
+        found_docs.append((doc['id'], score))
+    found_docs.sort(key=lambda item: item[1], reverse=True)
+    result = [doc_id for doc_id, score in found_docs if score > 0]
+
     return result
+

@@ -12,7 +12,7 @@ docs = [
     {'id': 'doc4', 'text': doc4},
 ]
 
-input_str = "Hello, World! ;:>=-)_This is a test: @2023 #Python."
+input_str = "Hello, World! ;:>=-)_This is a test: @2025 #Python."
 
 
 def test_search():
@@ -26,5 +26,9 @@ def test_search_relevance():
     assert search_engine.search(docs, 'shoot') == ['doc2', 'doc1']
 
 
-def test_string_cleaner():
-    assert search_engine.string_cleaner(input_str) == 'Hello World This is a test 2023 Python'
+def test_search_few_words():
+    assert search_engine.search(docs, 'shoot at me') == ['doc2', 'doc1']
+
+
+def test_tokenize():
+    assert search_engine.tokenize(input_str) == ['hello', 'world', 'this', 'is', 'a', 'test', '2025', 'python']
