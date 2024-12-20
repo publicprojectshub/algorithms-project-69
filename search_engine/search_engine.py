@@ -2,12 +2,14 @@ import re
 from collections import Counter, defaultdict
 
 
-def tokenize(text):
+def tokenize(text: str):
     """return list of split and lower text and digits and apostrophes"""
     return re.findall(r"[a-zA-Z0-9']+", text.lower())
 
 
-def calculate_relevance_score(doc_tokens, query_tokens):
+def calculate_relevance_score(doc: dict, query: str):
+    doc_tokens = tokenize(doc['text'])
+    query_tokens = tokenize(query)
     doc_counter = Counter(doc_tokens)
     query_counter = Counter(query_tokens)
     intersections = set(doc_counter) & set(query_counter)
@@ -29,11 +31,9 @@ def index_inverter(docs_list: list):
 
 
 def search(docs: list, query: str):
-    query_tokens = tokenize(query)  # (doc id: score)
     found_docs = []
     for doc in docs:
-        doc_tokens = tokenize(doc['text'])
-        score = calculate_relevance_score(doc_tokens, query_tokens)
+        score = calculate_relevance_score(doc, query)
         found_docs.append((doc['id'], score))
     found_docs.sort(key=lambda item: item[1], reverse=True)
     result = [doc_id for doc_id, score in found_docs if score > 0]
